@@ -1,60 +1,76 @@
 [![Publish](https://github.com/zimbres/UptimeKumaRemoteProbe/actions/workflows/dotnet.yml/badge.svg?event=release)](https://github.com/zimbres/UptimeKumaRemoteProbe/actions/workflows/dotnet.yml) [![.CodeQL](https://github.com/zimbres/UptimeKumaRemoteProbe/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/zimbres/UptimeKumaRemoteProbe/actions/workflows/codeql-analysis.yml)
 
-
 # Uptime Kuma Remote Probe / Push Agent
 
 >Uptime Kuma repository https://github.com/louislam/uptime-kuma
+>
+>Pre built container https://hub.docker.com/r/zimbres/uptime-kuma-remote-probe
 
 ---
+## Configuration
 
-### Pre built container
+### Remote Probe Configuration
 
->https://hub.docker.com/r/zimbres/uptime-kuma-remote-probe
+Services configuration is done by editing the file **appsettings.json** and restarting application.
 
+:warning: ***Please be informed that accounts with 2FA are not supported.***
 
+#### Example:
+```json
+{
+    "Configurations": {
+    "Url": "http://192.168.100.190:3001/",
+    "Token": "REPLACE_WITH_YOUR_UPTIME_KUMA_TOKEN",
+    "Username": "admin",
+    "Password": "Admin123",
+    "ProbeName": "Home",
+    "UpDependency": "192.168.1.1",
+    "Timeout": 1000,
+    "Delay": 60000,
+    "ConnectionStrings": {
+      "PGSQL": "Host=localhost;Database=postgres;Username=postgres;Password=postgres"
+    },
+    "WhoisApiUrl": "https://whoisjson.com/api/v1/whois?domain=keep.this&format=json",
+    "WhoisApiToken": "whoisjsonApiToken"
+    }
+}
+```
+>- **Token**: If set the probe will use it to authenticate and if not it falls back to Username/Password.
+>- **UpDependency**: Should be a trustable IP in your network, your ISP gateway for example. In case of this IP is not available, no other checks will be executed.
+>- **Delay**: is the delay time between checks. It is expressed in milliseconds, in this example 1 minute = 60000 ms between each round.
+>- **ProbeName**: Will help the probe identify the monitors that should be fetched from UK instance.
+>- **WhoisApiToken**: 
+>   - You need an account registered on [Whois Json](https://whoisjson.com/) if you want Domain check. 
+>   - This service has a api call limit of 500 per month, which would be enough since this check will run once a day only, or at the probe restart. 
+>   - By default if the domain expiration date is < 30 days, probe will not push to UK and generate an alert.
 ---
 
-Services configuration is done by editing the file appsettings.json and restarting application.
+### Monitors configuration 
 
-`"UpDependency": "192.168.1.1"` should be a trustable IP in your network, your ISP gateway for example. In case of this IP is not available, no other checks will be executed.
+**Please Note** : From version > 3.0 services to be executed on the probe will be auto discovered by tags set in UK.
 
-`"Delay": 60000` is the delay time between checks. It is expressed in milliseconds, in this example 1 minute between each round.
+:warning: ***Tags and Values are case sensitive.***
 
----
-
-**Please Note** : From version > 3.0 the services configuration is not done by adding it to appsettings.json, services to be executed on the probe will be auto discovered by tags set in UK.
-
-Username and Password for UK need to be set on appsettings.json "Configurations.Username/Password" also UK Url. Account with 2FA is not supported.
-
-Ex:
-
-- Tag Name: "Probe" / Tag Value: "House" -> This value also must be set in appsettings.json on field "Configurations.ProbeName"
-- Tag Name: "Type" / Tag Value: "Ping"
-- Tag Name: "Address" / Tag Value: "1.1.1.1"
-- Tag Name: "Domain" / Tag Value: "domain.com"
-- Tag Name: "Method" / Tag Value: "GET"
-- Tag Name: "CertificateExpiration" / Tag Value: "7"
-- Tag Name: "IgnoreSSL" / Tag Value: "False"
+|       Tag Name        | Tag Value Example |                           Description                                     |
+|-----------------------|-------------------|---------------------------------------------------------------------------|
+| Probe                 | House             | Must match the value set in appsettings.json "Configurations.ProbeName"   |
+| Type                  | Ping              | Type of check to perform                                                  |
+| Address               | 1.1.1.1           | Target address to check                                                   |
+| Domain                | domain.com        | Domain name for DNS/certificate checks                                    |
+| Method                | GET               | HTTP method for web checks                                                |
+| CertificateExpiration | 7                 | Days before certificate expiration warning                                |
+| IgnoreSSL             | False             | Whether to bypass SSL verification                                        |
+| Keyword               | Success           | Need to be set when Type=Http if you want to detect specific keyword      |
 
 ![image](https://github.com/zimbres/UptimeKumaRemoteProbe/assets/29772043/a4a9fd07-4f33-4f4f-9c27-24b59be42b28)
 
----
-Available monitors type are:
-
-- Ping
-- Http, with or whithout Keyword. Tag Name "Keyword" must be applied to also check this
-- Tcp
-- Certificate
-- Database
-- Domain
-
-`Tags and Values are case sensitive.`
-
-Service for Domain check is [Whois Json](https://whoisjson.com/). You need an account and replace the "WhoisApiToken" field with your token on appsettings.json.
-
-This service has a api call limit of 500 per month, this would be enough since this check will run once a day only, or at the probe restart.
-
-By default if the domain expiration date is < 30 days, probe will not push to UK and generate an alert.
+#### Available monitor types are:
+- **Ping**
+- **Http**
+- **Tcp**
+- **Certificate**
+- **Database**
+- **Domain**
 
 ---
 

@@ -22,9 +22,9 @@ public class MonitorsService
 
             var data = new
             {
-                username = _appSettings.Username,
-                password = _appSettings.Password,
-                token = ""
+                username = string.IsNullOrEmpty(_appSettings.Token) ? _appSettings.Username : "",
+                password = string.IsNullOrEmpty(_appSettings.Token) ? _appSettings.Password : "",
+                token = _appSettings.Token ?? ""
             };
 
             JsonElement monitorsRaw = new();
@@ -41,7 +41,7 @@ public class MonitorsService
                     var result = JsonNode.Parse(ack.GetValue<JsonElement>(0).ToString());
                     if (result["ok"].ToString() != "true")
                     {
-                        _logger.LogError("Uptime Kuma login failure");
+                        _logger.LogError("Uptime Kuma authentication failure");
                     }
                 }, data);
             };

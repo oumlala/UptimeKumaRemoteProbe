@@ -7,6 +7,7 @@ public class AppSettings
     public string Url { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+    public string Token { get; set; }
     public string ProbeName { get; set; }
     public string UpDependency { get; set; }
     public int Timeout { get; set; }
@@ -23,6 +24,7 @@ public class AppSettings
         Url = Environment.GetEnvironmentVariable("Url") is not null && useEnv ? Environment.GetEnvironmentVariable("Url") : _configuration.Url;
         Username = Environment.GetEnvironmentVariable("Username") is not null && useEnv ? Environment.GetEnvironmentVariable("Username") : _configuration.Username;
         Password = Environment.GetEnvironmentVariable("Password") is not null && useEnv ? Environment.GetEnvironmentVariable("Password") : _configuration.Password;
+        Token = Environment.GetEnvironmentVariable("Token") is not null && useEnv ? Environment.GetEnvironmentVariable("Token") : _configuration.Token;
         ProbeName = Environment.GetEnvironmentVariable("ProbeName") is not null && useEnv ? Environment.GetEnvironmentVariable("ProbeName") : _configuration.ProbeName;
         UpDependency = Environment.GetEnvironmentVariable("UpDependency") is not null && useEnv ? Environment.GetEnvironmentVariable("UpDependency") : _configuration.UpDependency;
         Timeout = Environment.GetEnvironmentVariable("Timeout") is not null && useEnv ? int.Parse(Environment.GetEnvironmentVariable("Timeout")) : _configuration.Timeout;

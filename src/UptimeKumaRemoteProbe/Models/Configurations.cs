@@ -6,6 +6,7 @@ public class Configurations
     public string Url { get; set; }
     public string Username { get; set; }
     public string Password { get; set; }
+    public string Token { get; set; }
     public string ProbeName { get; set; }
     public string UpDependency { get; set; }
     public int Timeout { get; set; }
