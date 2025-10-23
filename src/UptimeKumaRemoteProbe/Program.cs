@@ -32,6 +32,13 @@ builder.Services.Configure<HealthCheckPublisherOptions>(options =>
 });
 builder.Services.AddSingleton<VersionService>();
 builder.Services.AddSingleton<AppSettings>();
+builder.Services.AddSingleton<OAuthTokenManager>(sp =>
+{
+    var appSettings = sp.GetRequiredService<AppSettings>();
+    var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Default");
+    var logger = sp.GetRequiredService<ILogger<OAuthTokenManager>>();
+    return new OAuthTokenManager(appSettings.OAuth, httpClient, logger);
+});
 
 var host = builder.Build();
 host.Run();

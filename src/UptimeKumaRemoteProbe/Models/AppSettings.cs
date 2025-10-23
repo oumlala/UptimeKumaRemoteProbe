@@ -14,6 +14,7 @@ public class AppSettings
     public int Delay { get; set; }
     public string WhoisApiUrl { get; set; }
     public string WhoisApiToken { get; set; }
+    public OAuthSettings OAuth { get; set; }
 
     public AppSettings(IConfiguration configuration)
     {
@@ -31,5 +32,24 @@ public class AppSettings
         Delay = Environment.GetEnvironmentVariable("Delay") is not null && useEnv ? int.Parse(Environment.GetEnvironmentVariable("Delay")) : _configuration.Delay;
         WhoisApiUrl = Environment.GetEnvironmentVariable("WhoisApiUrl") is not null && useEnv ? Environment.GetEnvironmentVariable("WhoisApiUrl") : _configuration.WhoisApiUrl;
         WhoisApiToken = Environment.GetEnvironmentVariable("WhoisApiToken") is not null && useEnv ? Environment.GetEnvironmentVariable("WhoisApiToken") : _configuration.WhoisApiToken;
+
+        OAuth = new OAuthSettings
+        {
+            ClientId = Environment.GetEnvironmentVariable("OAuthClientId") is not null && useEnv
+                ? Environment.GetEnvironmentVariable("OAuthClientId")
+                : _configuration.OAuth?.ClientId,
+            ClientSecret = Environment.GetEnvironmentVariable("OAuthClientSecret") is not null && useEnv
+                ? Environment.GetEnvironmentVariable("OAuthClientSecret")
+                : _configuration.OAuth?.ClientSecret,
+            TokenUrl = Environment.GetEnvironmentVariable("OAuthTokenUrl") is not null && useEnv
+                ? Environment.GetEnvironmentVariable("OAuthTokenUrl")
+                : _configuration.OAuth?.TokenUrl,
+            Scope = Environment.GetEnvironmentVariable("OAuthScope") is not null && useEnv
+                ? Environment.GetEnvironmentVariable("OAuthScope")
+                : _configuration.OAuth?.Scope,
+            GrantType = Environment.GetEnvironmentVariable("OAuthGrantType") is not null && useEnv
+                ? Environment.GetEnvironmentVariable("OAuthGrantType")
+                : _configuration.OAuth?.GrantType ?? "client_credentials"
+        };
     }
 }

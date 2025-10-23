@@ -4,11 +4,13 @@ public class MonitorsService
 {
     private readonly ILogger<MonitorsService> _logger;
     private readonly AppSettings _appSettings;
+    private readonly OAuthTokenManager? _oAuthTokenManager;
 
-    public MonitorsService(ILogger<MonitorsService> logger, AppSettings appSettings)
+    public MonitorsService(ILogger<MonitorsService> logger, AppSettings appSettings, OAuthTokenManager? oAuthTokenManager = null)
     {
         _logger = logger;
         _appSettings = appSettings;
+        _oAuthTokenManager = oAuthTokenManager;
     }
 
     public async Task<List<Monitors>> GetMonitorsAsync()
@@ -20,11 +22,27 @@ public class MonitorsService
                 ReconnectionAttempts = 3
             });
 
+            string authToken = _appSettings.Token ?? "";
+
+            // Check if OAuth is configured and get OAuth token
+            if (_oAuthTokenManager != null && !string.IsNullOrEmpty(_appSettings.OAuth?.ClientId))
+            {
+                try
+                {
+                    authToken = await _oAuthTokenManager.GetValidTokenAsync();
+                    _logger.LogInformation("Using OAuth authentication");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to get OAuth token, falling back to configured authentication");
+                }
+            }
+
             var data = new
             {
-                username = string.IsNullOrEmpty(_appSettings.Token) ? _appSettings.Username : "",
-                password = string.IsNullOrEmpty(_appSettings.Token) ? _appSettings.Password : "",
-                token = _appSettings.Token ?? ""
+                username = string.IsNullOrEmpty(authToken) ? _appSettings.Username : "",
+                password = string.IsNullOrEmpty(authToken) ? _appSettings.Password : "",
+                token = authToken
             };
 
             JsonElement monitorsRaw = new();

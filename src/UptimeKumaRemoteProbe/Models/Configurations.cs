@@ -13,6 +13,7 @@ public class Configurations
     public int Delay { get; set; }
     public string WhoisApiUrl { get; set; }
     public string WhoisApiToken { get; set; }
+    public OAuthSettings OAuth { get; set; }
 }
 
 public class Endpoint

@@ -74,6 +74,53 @@ Services configuration is done by editing the file **appsettings.json** and rest
 
 ---
 
+## OAuth 2.0 Configuration
+
+The application now supports OAuth 2.0 authentication to secure communications with the central Uptime Kuma instance.
+
+### Configuration in appsettings.json
+
+```json
+{
+  "Configurations": {
+    "OAuth": {
+      "ClientId": "your-client-id",
+      "ClientSecret": "your-client-secret",
+      "TokenUrl": "https://your-auth-server/oauth/token",
+      "Scope": "monitor:write",
+      "GrantType": "client_credentials"
+    }
+  }
+}
+```
+
+### Environment Variables
+
+OAuth parameters can also be configured using environment variables:
+
+- `OAuthClientId`: OAuth client ID
+- `OAuthClientSecret`: OAuth client secret
+- `OAuthTokenUrl`: Authorization server URL
+- `OAuthScope`: Permission scope (optional)
+- `OAuthGrantType`: OAuth grant type (default: "client_credentials")
+
+### Security
+
+- Never store OAuth secrets directly in code or version control
+- Use environment variables or secure secrets in production
+- Regularly check the validity and rotation of your OAuth credentials
+
+### Authentication Flow
+
+1. The probe requests an access token using client credentials
+2. The token is cached and automatically renewed before expiration
+3. All API requests include the Bearer token in the Authorization header
+4. Failed authentication attempts are automatically retried with a new token
+
+For more details about OAuth implementation, please refer to the [OAuth 2.0 specification](https://oauth.net/2/).
+
+---
+
 Pré compiled package is available for Windows and Linux. It requires .Net Runtime 9.x.
 
 [Download .NET 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
